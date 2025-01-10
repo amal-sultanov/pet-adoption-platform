@@ -1,0 +1,240 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Pet Adoption | Posts</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{% static 'lib/flaticon/font/flaticon.css' %}" rel="stylesheet">
+    <link href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static  'css/style.css'%}" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow-sm py-3 py-lg-0 px-3 px-lg-0">
+        <a href="{% url 'pages:homepage' %}" class="navbar-brand ms-lg-5">
+            <h1 class="m-0 text-uppercase text-dark">
+                <i class="bi bi-house fs-1 text-primary me-3"></i>Pet Adoption
+            </h1>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <div class="navbar-nav ms-auto py-0">
+                <a href="{% url 'pages:homepage' %}" class="nav-item nav-link {% if request.path == '/' %}active{% endif %}">
+                    Home
+                </a>
+                <a href="{% url 'pets:pets' %}" class="nav-item nav-link {% if request.path == '/pets/' %}active{% endif %}">
+                    Pets
+                </a>
+                <a href="{% url 'posts:posts' %}" class="nav-item nav-link {% if request.path == '/posts/' %}active{% endif %}">
+                    Posts
+                </a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'users:selected_pets' %}" class="nav-item nav-link {% if request.path == '/accounts/selected-pets/' %}active{% endif %}">
+                        Selected Pets
+                    </a>
+                    <a href="{% url 'users:history' %}" class="nav-item nav-link {% if request.path == '/accounts/history/' %}active{% endif %}">
+                        History
+                    </a>
+                    <a href="{% url 'users:logout' %}" class="nav-item nav-link me-5">
+                        Log out
+                    </a>
+                {% else %}
+                    <a href="{% url 'users:login' %}" class="nav-item nav-link nav-contact bg-primary text-white px-5 ms-lg-5">
+                        Sign in <i class="bi bi-arrow-right"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row g-5">
+            <div class="col-lg-8">
+                {% for post in page_obj %}
+                    <div class="blog-item mb-5">
+                        <div class="row g-0 bg-light overflow-hidden">
+                            <div class="col-12 col-sm-5 h-100">
+                                <img class="img-fluid h-100" src="{{ post.image.url }}" style="object-fit: cover;">
+                            </div>
+                            <div class="col-12 col-sm-7 h-100 d-flex flex-column justify-content-center">
+                                <div class="p-4">
+                                    <div class="d-flex mb-3">
+                                        <small class="me-3">
+                                            <i class="bi bi-bookmarks me-2"></i>{{ post.category.title }}
+                                        </small>
+                                        <small>
+                                            <i class="bi bi-calendar-date me-2"></i>{{ post.created_at|date:"d.m.Y" }}, at {{ post.created_at|time:"H:i" }}
+                                        </small>
+                                    </div>
+                                    <h5 class="text-uppercase mb-3">
+                                        {{ post.title|truncatechars:64 }}
+                                    </h5>
+                                    <p>
+                                        {{ post.description|truncatechars:128 }}
+                                    </p>
+                                    <a class="text-primary text-uppercase" href="{% url 'posts:post_detail' pk=post.pk %}">
+                                        Read More<i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>
+                        No posts found
+                    </p>
+                {% endfor %}
+
+                {% if page_obj %}
+                    <div class="col-12">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination pagination-lg m-0">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link rounded-0" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                            <span aria-hidden="true"><i class="bi bi-arrow-left"></i></span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                <li class="page-item active">
+                                    <a class="page-link" href="?page={{ page_obj.number }}">
+                                        {{ page_obj.number }}
+                                    </a>
+                                </li>
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link rounded-0" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                            <span aria-hidden="true"><i class="bi bi-arrow-right"></i></span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                {% else %}
+                {% endif %}
+            </div>
+
+            <div class="col-lg-4">
+                <div class="mb-5">
+                    <div class="input-group">
+                        <form method="GET" class="d-flex">
+                            <input type="text" class="form-control p-3" name="search" placeholder="Search...">
+                            <button class="btn btn-primary px-4" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <h3 class="text-uppercase border-start border-5 border-primary ps-3 mb-4">
+                        Categories
+                    </h3>
+                    <div class="d-flex flex-column justify-content-start">
+                        {% for category in categories %}
+                            <a class="h5 bg-light py-2 px-3 mb-2" href="{% url 'posts:category' pk=category.pk %}">
+                                <i class="bi bi-arrow-right me-2"></i>{{ category.title }}
+                            </a>
+                        {% empty %}
+                            <p>
+                                No categories found
+                            </p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <h3 class="text-uppercase border-start border-5 border-primary ps-3 mb-4">
+                        Recent Posts
+                    </h3>
+                    {% for post in recent_posts %}
+                        <div class="d-flex overflow-hidden mb-3">
+                            <img class="img-fluid" src="{{ post.image.url }}" style="width: 100px; height: 100px; object-fit: cover;" alt="{{ post.title }}">
+                            <a href="{% url 'posts:post_detail' pk=post.pk %}" class="h5 d-flex align-items-center bg-light px-3 mb-0">
+                                {{ post.title }}
+                            </a>
+                        </div>
+                    {% empty %}
+                        <p>
+                            No posts found
+                        </p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid bg-light mt-4 py-5">
+        <div class="container pt-2">
+            <div class="row g5 justify-content-center">
+                <div class="col-lg-4 offset-1">
+                    <h5 class="text-uppercase border-start border-5 border-primary ps-3 mb-4">
+                        Get In Touch
+                    </h5>
+                    <p class="mb-2">
+                        <i class="bi bi-geo-alt text-primary me-2"></i>Our office: Tashkent, Uzbekistan
+                    </p>
+                    <p class="mb-2">
+                        <i class="bi bi-envelope-open text-primary me-2"></i>Email Us: info@example.com
+                    </p>
+                    <p class="mb-0">
+                        <i class="bi bi-telephone text-primary me-2"></i>Call Us: +998(99)123-45-67
+                    </p>
+                </div>
+                <div class="col-lg-4 offset-2">
+                    <h5 class="text-uppercase border-start border-5 border-primary ps-3 mb-4">
+                        Quick Links
+                    </h5>
+                    <div class="d-flex flex-column justify-content-start">
+                        <a class="text-body mb-2" href="{% url 'pages:homepage' %}">
+                            <i class="bi bi-arrow-right text-primary me-2"></i>Home
+                        </a>
+                        <a class="text-body mb-2" href="{% url 'pages:homepage' %}">
+                            <i class="bi bi-arrow-right text-primary me-2"></i>About Us
+                        </a>
+                        <a class="text-body mb-2" href="{% url 'pages:homepage' %}">
+                            <i class="bi bi-arrow-right text-primary me-2"></i>Our Services
+                        </a>
+                        <a class="text-body mb-2" href="{% url 'posts:posts' %}">
+                            <i class="bi bi-arrow-right text-primary me-2"></i>Blog
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid bg-dark text-white-50 py-4">
+        <div class="container">
+            <div class="row g-5">
+                <div class="text-center">
+                    <p class="mb-0">
+                        This template was designed by <a class="text-white" href="https://htmlcodex.com">HTML Codex</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="#" class="btn btn-primary py-3 fs-4 back-to-top">
+        <i class="bi bi-arrow-up"></i>
+    </a>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
